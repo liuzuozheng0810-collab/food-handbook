@@ -3,6 +3,8 @@ import { dataList } from './data.js';
 // State
 let searchTerm = '';
 let activeCategory = '全部';
+let activeSort = 'default';
+let activeMonth = 'all';
 const categories = ['全部', '蔬菜', '水果', '肉类', '海鲜', '豆制品', '菌菇', '内脏'];
 
 // DOM Elements
@@ -12,6 +14,11 @@ const foodGrid = document.getElementById('foodGrid');
 const emptyState = document.getElementById('emptyState');
 const countDisplay = document.getElementById('countDisplay');
 const currentCategoryTitle = document.getElementById('currentCategoryTitle');
+const monthDisplay = document.getElementById('monthDisplay');
+
+// Sort & Month Elements
+const sortButtons = document.querySelectorAll('[data-sort]');
+const monthButtons = document.querySelectorAll('[data-month]');
 
 // Modal Elements
 const foodModal = document.getElementById('foodModal');
@@ -34,6 +41,45 @@ function init() {
     setupEventListeners();
 }
 
+// ========== 核心函数：季节字符串转月份数组 ==========
+function seasonToMonths(seasonStr) {
+    if (!seasonStr) return [];
+    if (seasonStr.includes('全年')) return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+    let months = new Set();
+    const monthMap = { '春': [3, 4, 5], '夏': [6, 7, 8], '秋': [9, 10, 11], '冬': [12, 1, 2] };
+
+    // 1. 处理季节词 (春夏/秋冬等)
+    Object.keys(monthMap).forEach(key => {
+        if (seasonStr.includes(key)) monthMap[key].forEach(m => months.add(m));
+    });
+
+    // 2. 处理数字范围 (如 3–5月, 10–12月)
+    // 匹配类似 3-5, 10-翌年2, 9-11 等格式
+    const ranges = seasonStr.match(/(\d+)[–-](?:翌年)?(\d+)/g);
+    if (ranges) {
+        ranges.forEach(range => {
+            const [start, end] = range.match(/\d+/g).map(Number);
+            if (start <= end) {
+                for (let i = start; i <= end; i++) months.add(i);
+            } else {
+                // 处理跨年，如 10-2月
+                for (let i = start; i <= 12; i++) months.add(i);
+                for (let i = 1; i <= end; i++) months.add(i);
+            }
+        });
+    }
+    
+    // 3. 处理单个月份 (如 4月, 6月)
+    const singles = seasonStr.match(/(\d+)月/g);
+    if (singles && !ranges) {
+        singles.forEach(s => months.add(parseInt(s)));
+    }
+
+    return Array.from(months);
+}
+
+// ========== 渲染分类 ==========
 function renderCategories() {
     categoryContainer.innerHTML = categories.map(cat => `
         <button
@@ -49,12 +95,34 @@ function renderCategories() {
     `).join('');
 }
 
+// ========== 渲染食材卡片 ==========
 function renderCards() {
-    const filteredData = dataList.filter(item => {
+    // 1. 过滤
+    let filteredData = dataList.filter(item => {
         const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesCategory = activeCategory === '全部' || item.category === activeCategory;
-        return matchesSearch && matchesCategory;
+        
+        // 月份筛选逻辑
+        let matchesMonth = true;
+        if (activeMonth !== 'all') {
+            const availableMonths = seasonToMonths(item.season);
+            matchesMonth = availableMonths.includes(parseInt(activeMonth));
+        }
+        
+        return matchesSearch && matchesCategory && matchesMonth;
     });
+
+    // 2. 排序
+    if (activeSort === 'season') {
+        filteredData.sort((a, b) => {
+            const monthA = seasonToMonths(a.season)[0] || 13;
+            const monthB = seasonToMonths(b.season)[0] || 13;
+            return monthA - monthB;
+        });
+    } else if (activeSort === 'category') {
+        const order = ['蔬菜', '水果', '肉类', '海鲜', '豆制品', '菌菇', '内脏'];
+        filteredData.sort((a, b) => order.indexOf(a.category) - order.indexOf(b.category));
+    }
 
     countDisplay.textContent = `共 ${filteredData.length} 种`;
     currentCategoryTitle.textContent = activeCategory === '全部' ? '全部食材' : activeCategory;
@@ -102,13 +170,15 @@ function renderCards() {
     }).join('');
 }
 
-
+// ========== 设置事件监听器 ==========
 function setupEventListeners() {
+    // 搜索
     searchInput.addEventListener('input', (e) => {
         searchTerm = e.target.value;
         renderCards();
     });
 
+    // 分类
     categoryContainer.addEventListener('click', (e) => {
         const btn = e.target.closest('button');
         if (btn) {
@@ -118,11 +188,53 @@ function setupEventListeners() {
         }
     });
 
+    // 排序
+    sortButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            activeSort = e.target.dataset.sort;
+            
+            // 更新按钮样式
+            sortButtons.forEach(b => {
+                b.classList.remove('bg-green-600', 'text-white');
+                b.classList.add('bg-gray-100', 'text-gray-600');
+            });
+            e.target.classList.add('bg-green-600', 'text-white');
+            e.target.classList.remove('bg-gray-100', 'text-gray-600');
+            
+            renderCards();
+        });
+    });
+
+    // 月份筛选
+    monthButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            activeMonth = e.target.dataset.month;
+            
+            // 更新按钮样式
+            monthButtons.forEach(b => {
+                b.classList.remove('bg-green-600', 'text-white');
+                b.classList.add('bg-gray-100', 'text-gray-600');
+            });
+            e.target.classList.add('bg-green-600', 'text-white');
+            e.target.classList.remove('bg-gray-100', 'text-gray-600');
+            
+            // 更新月份显示文本
+            if (activeMonth === 'all') {
+                monthDisplay.textContent = '';
+            } else {
+                monthDisplay.textContent = `（${activeMonth}月已选）`;
+            }
+            
+            renderCards();
+        });
+    });
+
     // Modal Close
     const closeActions = [modalBackdrop, closeModalBtn, confirmBtn];
     closeActions.forEach(el => el.addEventListener('click', closeModal));
 }
 
+// ========== 模态框相关函数 ==========
 function openModal(item) {
     const categoryEmojis = {
         '蔬菜': '🥬',

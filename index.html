@@ -33,6 +33,29 @@
     />
   </div>
 
+<div class="px-4 mb-3">
+  <label class="text-[11px] text-gray-400 block mb-1.5 uppercase tracking-wider">排序方式</label>
+  <div class="flex gap-2">
+    <button data-sort="default" class="sort-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-green-600 text-white">默认</button>
+    <button data-sort="season" class="sort-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 text-gray-600">按上市时间</button>
+    <button data-sort="category" class="sort-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 text-gray-600">按大类</button>
+  </div>
+</div>
+
+<div class="px-4 mb-4">
+  <label class="text-[11px] text-gray-400 block mb-1.5 uppercase tracking-wider">
+    按月份查看 <span id="monthDisplay" class="text-green-600 font-bold"></span>
+  </label>
+  <div class="flex flex-wrap gap-1.5">
+    <button data-month="all" class="month-btn px-2.5 py-1 rounded-md text-xs bg-green-600 text-white">全部</button>
+    <script>
+      for(let i=1; i<=12; i++) {
+        document.write(`<button data-month="${i}" class="month-btn px-2.5 py-1 rounded-md text-xs bg-gray-100 text-gray-600">${i}月</button>`);
+      }
+    </script>
+  </div>
+</div>
+
   <!-- 分类栏 -->
   <div
     id="categoryContainer"

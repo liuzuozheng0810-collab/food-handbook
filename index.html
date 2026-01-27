@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
+  <title>大连时令食材手册</title>
+
+  <!-- Tailwind CDN（你当前样式依赖它，不能删） -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- 你的自定义样式 -->
+  <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body class="bg-gray-50 text-gray-900">
+
+  <!-- 顶部标题 -->
+  <header class="px-4 pt-5 pb-3">
+    <h1 class="text-xl font-bold">大连时令食材手册</h1>
+    <p id="countDisplay" class="text-xs text-gray-500 mt-1">共 0 种</p>
+  </header>
+
+  <!-- 搜索框 -->
+  <div class="px-4 mb-3">
+    <input
+      id="searchInput"
+      type="text"
+      placeholder="搜索食材名称"
+      class="w-full rounded-xl border border-gray-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+    />
+  </div>
+
+  <!-- 分类栏 -->
+  <div
+    id="categoryContainer"
+    class="px-4 flex space-x-2 overflow-x-auto no-scrollbar mb-4"
+  ></div>
+
+  <!-- 当前分类标题 -->
+  <div class="px-4 mb-2">
+    <h2
+      id="currentCategoryTitle"
+      class="text-sm font-semibold text-gray-700"
+    >
+      全部食材
+    </h2>
+  </div>
+
+  <!-- 食材卡片区 -->
+  <main class="px-4">
+    <div
+      id="foodGrid"
+      class="grid grid-cols-2 gap-3"
+    ></div>
+
+    <!-- 空状态 -->
+    <div
+      id="emptyState"
+      class="hidden text-center text-sm text-gray-400 py-10"
+    >
+      没有找到相关食材
+    </div>
+  </main>
+
+  <!-- 模态框 -->
+  <div
+    id="foodModal"
+    class="hidden fixed inset-0 z-50 flex items-end justify-center"
+  >
+    <!-- 遮罩 -->
+    <div
+      id="modalBackdrop"
+      class="absolute inset-0 bg-black/40"
+    ></div>
+
+    <!-- 内容 -->
+    <div
+      id="modalContent"
+      class="relative bg-white w-full max-w-md rounded-t-2xl p-4 transition-transform duration-300 translate-y-full"
+    >
+      <div class="flex justify-between items-center mb-3">
+        <h3 id="modalTitle" class="text-lg font-bold"></h3>
+        <button
+          id="closeModalBtn"
+          class="text-gray-400 text-xl leading-none"
+        >
+          ×
+        </button>
+      </div>
+
+      <div class="flex justify-center mb-4">
+        <span id="modalEmoji" class="text-7xl"></span>
+      </div>
+
+      <div class="flex items-center space-x-2 mb-2">
+        <span
+          id="modalCategoryBadge"
+          class="text-xs px-2 py-1 rounded border bg-gray-100 text-gray-600"
+        ></span>
+      </div>
+
+      <div class="text-sm text-gray-700 space-y-1 mb-4">
+        <div>
+          <span class="text-gray-400">上市：</span>
+          <span id="modalSeason"></span>
+        </div>
+        <div>
+          <span class="text-gray-400">产地：</span>
+          <span id="modalOrigin"></span>
+        </div>
+        <div>
+          <span class="text-gray-400">推荐做法：</span>
+          <span id="modalRecipe"></span>
+        </div>
+      </div>
+
+      <button
+        id="confirmBtn"
+        class="w-full bg-green-600 text-white py-2 rounded-xl text-sm"
+      >
+        知道了
+      </button>
+    </div>
+  </div>
+
+  <!-- JS：注意顺序 -->
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

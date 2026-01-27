@@ -20,6 +20,9 @@
   <!-- 顶部标题 -->
   <header class="px-4 pt-5 pb-3">
     <h1 class="text-xl font-bold">大连时令食材手册</h1>
+    <p class="text-[10px] text-gray-400 mt-1">
+      微信内可直接使用，建议添加到收藏
+    </p>
     <p id="countDisplay" class="text-xs text-gray-500 mt-1">共 0 种</p>
   </header>
 
@@ -151,5 +154,13 @@
 
   <!-- JS：注意顺序 -->
   <script type="module" src="./app.js"></script>
+
+  <!-- 微信识别脚本 -->
+  <script>
+    const isWeChat = /micromessenger/i.test(navigator.userAgent)
+    if (isWeChat) {
+      document.body.classList.add('wechat')
+    }
+  </script>
 </body>
 </html>

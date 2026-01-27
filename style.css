@@ -31,3 +31,22 @@
 .food-card {
     box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.05);
 }
+
+/* 微信内置浏览器体验优化 */
+body.wechat {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 防止顶部被微信 UI 遮挡 */
+body.wechat header {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* 卡片更接近小程序风格 */
+body.wechat #foodGrid {
+  gap: 10px;
+}
+
+body.wechat .food-card {
+  border-radius: 12px;
+}

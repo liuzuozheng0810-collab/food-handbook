@@ -8,13 +8,14 @@
   />
   <title>大连时令食材手册</title>
 
-  <!-- Tailwind CDN（你当前样式依赖它，不能删） -->
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- 你的自定义样式 -->
   <link rel="stylesheet" href="./style.css" />
-</head>
 
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#4ade80">
+</head>
 <body class="bg-gray-50 text-gray-900">
 
   <!-- 顶部标题 -->
@@ -153,13 +154,24 @@
   </div>
 
   <!-- JS：注意顺序 -->
-  <script type="module" src="./app.js"></script>
+   <script type="module" src="./app.js"></script>
 
   <!-- 微信识别脚本 -->
   <script>
     const isWeChat = /micromessenger/i.test(navigator.userAgent)
     if (isWeChat) {
       document.body.classList.add('wechat')
+    }
+  </script>
+
+  <!-- 注册 Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('Service Worker 注册成功:', reg))
+          .catch(err => console.log('Service Worker 注册失败:', err));
+      });
     }
   </script>
 </body>
